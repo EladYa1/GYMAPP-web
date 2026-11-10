@@ -113,6 +113,18 @@
     <script src="js/gymapp.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
 
+    <!-- רישום ה-service worker, ובלעדיו אין אופליין.
+
+         זה אינו פרט טכני כאן אלא דרישה: צד המתאמן תוכנן לעבוד בלי רשת
+         (ראו "מה עובד בלי שרת"), ובדפדפן "בלי רשת" פירושו שה-service
+         worker מגיש את האפליקציה מהמטמון. בלי השורה הזו פתיחה במכון
+         בלי קליטה הייתה מחזירה שגיאת רשת.
+
+         ‎?.‎ ולא בדיקה מפורשת: בהקשר שאינו מאובטח (http על כתובת שאינה
+         localhost) האובייקט אינו קיים כלל, ואין טעם להפיל על כך את
+         עליית האפליקציה. -->
+    <script>navigator.serviceWorker?.register("service-worker.js");</script>
+
 </body>
 
 </html>

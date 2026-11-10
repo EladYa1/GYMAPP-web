@@ -1,12 +1,12 @@
 self.assetsManifest = {
-  "version": "eGiOcCQJ",
+  "version": "jIqDmJPu",
   "assets": [
     {
       "hash": "sha256-VsYG6uboEtMMXm+E5W7SU0NabwCkzhNvPk2HyeWGq4o=",
       "url": "GYMAPP.Web.styles.css"
     },
     {
-      "hash": "sha256-9w90G6v/LHfp35o1AxKoWnHD6hPQ5CEXqjgkc3/y+Lk=",
+      "hash": "sha256-CfzVREpseB5YtnZiVFce/oB54eAbWi7m/Kyc9UxldmI=",
       "url": "_framework/GYMAPP.Web.wasm"
     },
     {
@@ -190,7 +190,7 @@ self.assetsManifest = {
       "url": "_framework/blazor.webassembly.js"
     },
     {
-      "hash": "sha256-PxFpntF+2+nFANZLrRW8MJ2yjh5CmUrZyUwBQ1ekjh8=",
+      "hash": "sha256-SMutYbYETtZaWEi9cPEnsaZDzJXutQIBGVvo9HIWcX0=",
       "url": "_framework/dotnet.js"
     },
     {
@@ -242,7 +242,7 @@ self.assetsManifest = {
       "url": "icon-512.png"
     },
     {
-      "hash": "sha256-MJd4z6LGp2ifhj1fPI14CBOs5VAU2gxXZi9u/Pobz1s=",
+      "hash": "sha256-em9Z7hdegydlp26Tyzm1o+Bwvd7GTA8cR46Qd7l51Yg=",
       "url": "index.html"
     },
     {
