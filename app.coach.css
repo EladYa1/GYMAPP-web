@@ -1,0 +1,1249 @@
+/* ============================================================
+   GYMAPP — דשבורד מאמן
+   הפריסה כולה כתובה במאפיינים לוגיים (inline-start/end) כדי
+   שהממשק יעבוד נכון ב-RTL.
+   ============================================================ */
+
+:root {
+    color-scheme: light;
+
+    --plane:        #f9f9f7;
+    --surface:      #fcfcfb;
+    --surface-sunk: #f2f2ee;
+
+    --ink:          #0b0b0b;
+    --ink-2:        #52514e;
+    --ink-muted:    #898781;
+
+    --grid:         #e1e0d9;
+    --baseline:     #c3c2b7;
+    --border:       rgba(11, 11, 11, 0.10);
+
+    --accent:       #2a78d6;
+    --accent-ink:   #ffffff;
+    --accent-soft:  #cde2fb;
+
+    /* צבעי מצב — קבועים, לא מוחלפים בין מצבי תצוגה */
+    --good:         #0ca30c;
+    --warning:      #fab219;
+    --critical:     #d03b3b;
+    --good-text:    #006300;
+    --critical-text:#b02b2b;
+
+    --radius:       14px;
+    --radius-sm:    9px;
+    --shadow:       0 1px 2px rgba(11, 11, 11, 0.05), 0 6px 18px rgba(11, 11, 11, 0.05);
+
+    --font: system-ui, -apple-system, "Segoe UI", "Noto Sans Hebrew", Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+
+        --plane:        #0d0d0d;
+        --surface:      #1a1a19;
+        --surface-sunk: #121211;
+
+        --ink:          #ffffff;
+        --ink-2:        #c3c2b7;
+        --ink-muted:    #898781;
+
+        --grid:         #2c2c2a;
+        --baseline:     #383835;
+        --border:       rgba(255, 255, 255, 0.10);
+
+        --accent:       #3987e5;
+        --accent-ink:   #0d0d0d;
+        --accent-soft:  #184f95;
+
+        --good-text:    #0ca30c;
+        --critical-text:#e66767;
+
+        --shadow:       0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 18px rgba(0, 0, 0, 0.3);
+    }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    block-size: 100%;
+}
+
+body {
+    background: var(--plane);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    overflow-wrap: anywhere;
+}
+
+h1, h2, h3 { margin: 0; line-height: 1.25; }
+h1 { font-size: 1.5rem; font-weight: 650; }
+h2 { font-size: 1.05rem; font-weight: 620; }
+p  { margin: 0; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.subtle { color: var(--ink-2); }
+.small  { font-size: 0.82rem; }
+.strong { font-weight: 650; }
+.error  { color: var(--critical-text); font-weight: 560; }
+
+.status-bar-safe-area {
+    block-size: env(safe-area-inset-top);
+    background: var(--surface);
+}
+
+/* ---------- מעטפת ---------- */
+
+.app {
+    display: flex;
+    flex-direction: column;
+    min-block-size: 100%;
+}
+
+.appbar {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 12px clamp(14px, 4vw, 32px);
+    background: var(--surface);
+    border-block-end: 1px solid var(--border);
+}
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    white-space: nowrap;
+}
+.brand:hover { text-decoration: none; }
+.brand-mark { font-size: 1.15rem; }
+
+.appnav {
+    display: flex;
+    gap: 4px;
+    margin-inline-start: auto;
+}
+
+/* nowrap הוא הכרחי ולא קוסמטי: body מגדיר overflow-wrap: anywhere,
+   ובלעדיו שמות הלשוניות נשברים באמצע מילה ברגע שהשורה נדחסת. */
+.navlink {
+    padding: 6px 12px;
+    border-radius: 999px;
+    color: var(--ink-2);
+    font-weight: 560;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+.navlink:hover { background: var(--surface-sunk); text-decoration: none; }
+.navlink.active { background: var(--accent); color: var(--accent-ink); }
+
+.content {
+    flex: 1;
+    inline-size: 100%;
+    max-inline-size: 1040px;
+    margin-inline: auto;
+    padding: clamp(16px, 4vw, 28px) clamp(14px, 4vw, 32px) 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* כפתור חזרה — בולט ולחיץ, במקום קישור פירורי לחם דק */
+.btn-back {
+    align-self: start;
+    background: var(--surface-sunk);
+    font-weight: 600;
+}
+.btn-back:hover { background: var(--surface); border-color: var(--accent); }
+
+.page-foot {
+    display: flex;
+    justify-content: center;
+    padding-block-start: 4px;
+}
+
+.page-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.head-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ---------- רכיבי בסיס ---------- */
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+}
+
+.empty {
+    text-align: center;
+    display: grid;
+    gap: 10px;
+    justify-items: center;
+    padding-block: 36px;
+}
+
+.empty-inline {
+    color: var(--ink-muted);
+    font-size: 0.85rem;
+    padding-block: 14px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-block-size: 38px;
+    padding: 0 16px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    font-weight: 560;
+    font-size: 0.9rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.btn:hover { background: var(--surface-sunk); text-decoration: none; }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.btn:disabled:hover { background: var(--surface); }
+
+.btn-primary {
+    background: var(--accent);
+    border-color: transparent;
+    color: var(--accent-ink);
+}
+.btn-primary:hover { background: var(--accent); filter: brightness(1.08); }
+
+.btn-ghost { border-color: transparent; background: transparent; }
+.btn-danger { color: var(--critical-text); }
+
+.input {
+    inline-size: 100%;
+    min-block-size: 40px;
+    padding: 8px 12px;
+    border: 1px solid var(--baseline);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+}
+.input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-color: var(--accent);
+}
+textarea.input { min-block-size: 64px; resize: vertical; }
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+.search { max-inline-size: 280px; }
+
+.segmented {
+    display: inline-flex;
+    padding: 3px;
+    gap: 2px;
+    background: var(--surface-sunk);
+    border-radius: 999px;
+}
+.segmented button {
+    border: 0;
+    background: transparent;
+    color: var(--ink-2);
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 560;
+    padding: 6px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+}
+.segmented button.active {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+/* ---------- תגית מצב ---------- */
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 620;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    font-variant-numeric: tabular-nums;
+}
+.pill-icon { font-size: 0.78rem; line-height: 1; }
+
+/* הגוון נושא את המצב רק יחד עם הסמל והטקסט שבתוך התגית */
+.pill-hit    { color: var(--good-text);     background: color-mix(in srgb, var(--good) 12%, transparent);     border-color: color-mix(in srgb, var(--good) 35%, transparent); }
+.pill-close  { color: var(--ink);           background: color-mix(in srgb, var(--warning) 20%, transparent);  border-color: color-mix(in srgb, var(--warning) 50%, transparent); }
+.pill-missed { color: var(--critical-text); background: color-mix(in srgb, var(--critical) 12%, transparent); border-color: color-mix(in srgb, var(--critical) 35%, transparent); }
+.pill-none   { color: var(--ink-muted);     background: var(--surface-sunk);                                  border-color: var(--border); }
+
+/* ---------- מד יחס ---------- */
+
+.meter { display: grid; gap: 4px; }
+
+.meter-track {
+    block-size: 10px;
+    border-radius: 999px;
+    background: var(--surface-sunk);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+.meter-compact .meter-track { block-size: 7px; }
+
+.meter-fill {
+    block-size: 100%;
+    border-radius: 999px;
+    transition: inline-size 0.25s ease;
+}
+.meter-hit    { background: var(--good); }
+.meter-close  { background: var(--warning); }
+.meter-missed { background: var(--critical); }
+
+.meter-scale {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------- רשימת מתאמנים ---------- */
+
+.trainee-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 14px;
+}
+
+.trainee-card {
+    display: grid;
+    gap: 12px;
+    color: inherit;
+}
+.trainee-card:hover {
+    text-decoration: none;
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+
+.trainee-top {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+.trainee-id { min-inline-size: 0; margin-inline-end: auto; }
+.trainee-name { font-weight: 640; }
+
+.avatar {
+    display: grid;
+    place-items: center;
+    inline-size: 40px;
+    block-size: 40px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+@media (prefers-color-scheme: dark) {
+    .avatar { color: #ffffff; }
+}
+.avatar-lg { inline-size: 52px; block-size: 52px; font-size: 1.1rem; }
+
+.trainee-stats {
+    display: flex;
+    gap: 18px;
+    margin: 0;
+    flex-wrap: wrap;
+}
+.trainee-stats dt {
+    font-size: 0.74rem;
+    color: var(--ink-muted);
+    text-transform: none;
+}
+.trainee-stats dd {
+    margin: 0;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.delta {
+    font-size: 0.78rem;
+    font-weight: 620;
+    margin-inline-start: 5px;
+}
+/* ירוק = התקדמות לכיוון היעד, לא "ירידה במשקל" — יש מתאמנים שהיעד שלהם הוא לעלות */
+.delta-good { color: var(--good-text); }
+.delta-flat { color: var(--ink-2); }
+
+/* ---------- ניווט שבועות ---------- */
+
+.weeknav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 8px;
+}
+.weeknav-label {
+    display: grid;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------- מספר ההירו ---------- */
+
+.hero { display: grid; gap: 14px; }
+
+.hero-main {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.hero-figure {
+    font-size: 56px;
+    font-weight: 680;
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+.hero-unit { font-size: 24px; font-weight: 560; color: var(--ink-2); margin-inline-start: 2px; }
+.hero-note { margin-block-start: 6px; max-inline-size: 48ch; }
+
+/* ---------- משקל ---------- */
+
+.section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin-block-end: 12px;
+}
+
+.weight-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.weight-stats {
+    display: flex;
+    gap: 22px;
+    margin: 0;
+    flex-wrap: wrap;
+}
+.weight-stats dt { font-size: 0.76rem; color: var(--ink-muted); }
+.weight-stats dd {
+    margin: 0;
+    font-size: 1.22rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.weight-chart { flex: 1 1 240px; min-inline-size: 200px; }
+
+.sparkline {
+    inline-size: 100%;
+    block-size: 56px;
+    overflow: visible;
+}
+.trend-line {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+}
+.trend-dot {
+    stroke: var(--accent);
+    stroke-width: 9;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+}
+.goal-line {
+    stroke: var(--baseline);
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+    vector-effect: non-scaling-stroke;
+}
+.sparkline-axis {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+    margin-block-start: 2px;
+}
+
+/* ---------- כרטיסי מדדים ---------- */
+
+/* שני טורים בלבד, כדי שארבעת המדדים ייפלו 2×2 ולא 3+1 */
+.metrics {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+@media (min-width: 700px) {
+    .metrics { grid-template-columns: repeat(2, 1fr); }
+}
+
+.metric { display: grid; gap: 10px; align-content: start; }
+
+.metric-head {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 10px;
+}
+.metric-label { font-size: 0.8rem; color: var(--ink-2); font-weight: 560; }
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 650;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+}
+.metric-target {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+    margin-inline-start: 3px;
+}
+
+.weekchart {
+    inline-size: 100%;
+    block-size: 64px;
+    display: block;
+}
+
+/* רווח של משטח בין עמודות מושג דרך ה-gap בגיאומטריה; הטבעת מגדירה את הקצה.
+   non-scaling-stroke שומר על עובי אחיד למרות שה-viewBox נמתח לרוחב. */
+.bar {
+    stroke: var(--border);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+}
+.bar-hit     { fill: var(--good); }
+.bar-close   { fill: var(--warning); }
+.bar-missed  { fill: var(--critical); }
+.bar-missing { fill: var(--baseline); stroke: none; }
+
+/* קו היעד הוא הקידוד המשני: אפשר לקרוא עמידה גם בלי להבחין בגוונים */
+.target-line {
+    stroke: var(--ink-2);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+    vector-effect: non-scaling-stroke;
+}
+.target-band { fill: var(--grid); opacity: 0.75; }
+
+/* כל אות תופסת משבצת יום אחת מתוך שבע — אותה גיאומטריה כמו העמודות שמעליה */
+.weekaxis {
+    display: flex;
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+}
+.weekaxis span {
+    inline-size: calc(100% / 7);
+    text-align: center;
+}
+.axis-today { color: var(--ink); font-weight: 700; }
+
+.workout-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 6px;
+}
+.workout-list li {
+    display: flex;
+    gap: 10px;
+    font-size: 0.88rem;
+    padding-block: 5px;
+    border-block-end: 1px solid var(--grid);
+}
+.workout-list li:last-child { border-block-end: 0; }
+.workout-day { color: var(--ink-muted); min-inline-size: 48px; }
+
+/* ---------- טבלת הימים ---------- */
+
+.table-wrap { overflow-x: auto; }
+
+table.daily {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.9rem;
+}
+table.daily th, table.daily td {
+    text-align: start;
+    padding: 9px 10px;
+    border-block-end: 1px solid var(--grid);
+    white-space: nowrap;
+}
+table.daily thead th {
+    font-size: 0.76rem;
+    font-weight: 560;
+    color: var(--ink-muted);
+    border-block-end: 1px solid var(--baseline);
+}
+table.daily tbody tr { cursor: pointer; }
+table.daily tbody tr:hover { background: var(--surface-sunk); }
+.row-today { background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.row-future td, .row-future th { opacity: 0.45; }
+
+.daycell { display: inline-flex; gap: 7px; align-items: baseline; }
+
+/* רקע עדין בלבד — הסטטוס הנחרץ נקרא מהמקרא ומהגרפים, לא מהתא לבדו */
+.cell-hit    { background: color-mix(in srgb, var(--good) 11%, transparent); }
+.cell-close  { background: color-mix(in srgb, var(--warning) 18%, transparent); }
+.cell-missed { background: color-mix(in srgb, var(--critical) 11%, transparent); }
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-block-start: 12px;
+    font-size: 0.78rem;
+    color: var(--ink-2);
+}
+.legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.swatch {
+    inline-size: 11px;
+    block-size: 11px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    display: inline-block;
+}
+.swatch-hit    { background: var(--good); }
+.swatch-close  { background: var(--warning); }
+.swatch-missed { background: var(--critical); }
+.swatch-none   { background: var(--baseline); }
+
+.note p { color: var(--ink-2); margin-block-start: 8px; }
+
+/* ---------- טפסים ---------- */
+
+.form { display: grid; gap: 14px; }
+
+.form-section {
+    margin-block-start: 6px;
+    padding-block-start: 14px;
+    border-block-start: 1px solid var(--grid);
+}
+
+.field { display: grid; gap: 5px; min-inline-size: 0; }
+.field label { font-size: 0.82rem; font-weight: 560; color: var(--ink-2); }
+.hint { font-size: 0.74rem; color: var(--ink-muted); }
+
+.field-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding-block-start: 6px;
+}
+.form-actions .btn-danger { margin-inline-start: auto; }
+
+/* ---------- מדדים והיקפים ---------- */
+
+.measure-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 10px;
+}
+
+.measure-tile {
+    background: var(--surface-sunk);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+}
+.measure-label { font-size: 0.76rem; color: var(--ink-muted); }
+.measure-value {
+    font-size: 1.3rem;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+}
+.measure-unit {
+    font-size: 0.74rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+    margin-inline-start: 3px;
+}
+.measure-empty { color: var(--ink-muted); font-weight: 500; }
+
+/* ניטרלי בכוונה: ירידה בבטן וירידה בזרוע אינן אותו דבר, והאפליקציה
+   לא יודעת מה היעד של כל היקף — אז היא לא צובעת אותם טוב/רע. */
+.measure-delta {
+    font-size: 0.74rem;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+    margin-block-start: 2px;
+}
+
+/* ---------- בנק מאכלים ---------- */
+
+.food-name { font-weight: 600; }
+
+table.foods td, table.foods th { white-space: nowrap; }
+table.foods tbody tr { cursor: default; }
+
+.row-actions {
+    display: flex;
+    gap: 2px;
+    justify-content: flex-end;
+}
+
+.btn-sm {
+    min-block-size: 28px;
+    padding: 0 10px;
+    font-size: 0.8rem;
+}
+
+.input-sm {
+    min-block-size: 32px;
+    inline-size: 88px;
+    padding: 4px 8px;
+    font-size: 0.88rem;
+}
+
+/* ---------- צילום ארוחה ---------- */
+
+.scan-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-block-end: 14px;
+}
+
+.scan-preview {
+    display: block;
+    inline-size: 100%;
+    max-block-size: 300px;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface-sunk);
+    margin-block-end: 14px;
+}
+
+.total-row th, .total-row td {
+    border-block-start: 1px solid var(--baseline);
+    border-block-end: 0;
+    font-weight: 650;
+}
+
+.running-total {
+    padding-block: 8px;
+    font-variant-numeric: tabular-nums;
+    display: grid;
+    gap: 2px;
+}
+
+.input-name {
+    min-block-size: 32px;
+    inline-size: 100%;
+    min-inline-size: 140px;
+    padding: 4px 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* ---------- אימונים ---------- */
+
+.program-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+}
+
+.program-card { display: grid; gap: 10px; align-content: start; }
+
+.exercise-list {
+    margin: 0;
+    padding-inline-start: 20px;
+    display: grid;
+    gap: 5px;
+    font-size: 0.88rem;
+}
+.exercise-list li { padding-block: 2px; }
+.ex-name { font-weight: 560; margin-inline-end: 6px; }
+
+/* שורת עריכת תרגיל: נערמת לטור במסך צר */
+.exercise-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-sunk);
+}
+.exercise-index {
+    inline-size: 26px;
+    block-size: 26px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    font-size: 0.78rem;
+    font-weight: 650;
+    flex: 0 0 auto;
+    margin-block-end: 6px;
+}
+.exercise-name { flex: 1 1 180px; min-inline-size: 150px; }
+.exercise-num { flex: 0 0 92px; }
+.exercise-num .input { inline-size: 92px; }
+.exercise-actions {
+    display: flex;
+    gap: 2px;
+    margin-inline-start: auto;
+    margin-block-end: 2px;
+}
+
+.exercise-card { display: grid; gap: 10px; }
+
+.prev-line {
+    font-size: 0.85rem;
+    color: var(--ink-2);
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-sunk);
+    font-variant-numeric: tabular-nums;
+}
+
+table.sets td, table.sets th { padding: 6px 8px; }
+table.sets tbody tr { cursor: default; }
+table.sets tbody tr:hover { background: transparent; }
+
+.progress-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 10px;
+    margin-block-start: 10px;
+}
+.progress-tile {
+    display: grid;
+    gap: 5px;
+    justify-items: start;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-sunk);
+    border: 1px solid var(--border);
+}
+.progress-name {
+    font-size: 0.8rem;
+    color: var(--ink-2);
+    font-weight: 560;
+}
+.progress-top {
+    font-size: 1.25rem;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+}
+
+.hit-list {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 2px;
+}
+.hit-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-sunk);
+    font-size: 0.88rem;
+}
+.hit-list li:hover { background: color-mix(in srgb, var(--accent) 8%, var(--surface-sunk)); }
+.hit-name { flex: 1; font-weight: 560; min-inline-size: 0; }
+
+.uncertainty {
+    margin-block-start: 14px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--warning) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--warning) 40%, transparent);
+    font-size: 0.86rem;
+}
+.uncertainty ul { margin: 6px 0 0; padding-inline-start: 18px; }
+
+.warn {
+    margin-block-start: 14px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-sunk);
+    border-inline-start: 3px solid var(--warning);
+    font-size: 0.84rem;
+    color: var(--ink-2);
+}
+
+.ok { color: var(--good-text); font-weight: 560; }
+
+.checkline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: var(--ink-2);
+    margin-block-start: 4px;
+}
+.checkline input { inline-size: 16px; block-size: 16px; }
+
+.navlink-icon { font-size: 1.05rem; padding-inline: 10px; }
+
+/* יציאה לבחירת תפקיד — פעולה, לא לשונית. הקו המפריד מרחיק אותה
+   מהלשוניות כדי שלא תיראה כמו עוד מסך בניווט. */
+.navlink-exit {
+    margin-inline-start: 6px;
+    padding-inline-start: 14px;
+    border-inline-start: 1px solid var(--border);
+    color: var(--ink-muted);
+    font-weight: 500;
+    border-radius: 0 999px 999px 0;
+}
+.navlink-exit:hover { color: var(--ink); background: var(--surface-sunk); }
+
+/* הכפתור צריך להיראות כמו הקישורים שלידו. ברירות המחדל של
+   <button> — רקע, מסגרת, גופן מערכת — שוברות את השורה. */
+button.navlink-exit {
+    border-block: 0;
+    border-inline-end: 0;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+}
+
+/* שם המאמן המחובר. לא אינטראקטיבי, ולכן גם לא נראה כך. */
+.navlink-who {
+    color: var(--ink-2);
+    font-weight: 600;
+    cursor: default;
+}
+
+.navlink-offline { color: var(--warning-text, #8a6100); font-weight: 600; cursor: default; }
+
+/* ---------- חיווי סינכרון ---------- */
+
+/* יושב מעל תוכן הדף ולא נעלם מעצמו: הודעה על שמירה שלא הגיעה
+   לשרת חייבת להישאר עד שמישהו טיפל בה. */
+.sync-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+
+.sync-banner span { flex: 1; min-inline-size: 0; }
+
+.sync-banner-bad {
+    border-color: rgba(176, 42, 42, 0.35);
+    background: rgba(176, 42, 42, 0.08);
+    color: #8c1f1f;
+}
+
+.sync-banner-wait {
+    border-color: rgba(250, 178, 25, 0.45);
+    background: rgba(250, 178, 25, 0.12);
+    color: #70500a;
+}
+
+@media (prefers-color-scheme: dark) {
+    .sync-banner-bad  { color: #ff9b9b; }
+    .sync-banner-wait { color: #f5c860; }
+}
+
+/* ---------- סנכרון עם אפליקציית המתאמן ---------- */
+
+/* שורת המצב מתחת לכותרת המתאמן — מתי הוא דיווח לאחרונה */
+.sync-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: var(--surface-sunk);
+    border: 1px solid var(--border);
+    font-size: 0.84rem;
+    color: var(--ink-2);
+}
+
+/* הקוד ארוך בכוונה — גלילה פנימית במקום מסך שנמתח */
+.code-box {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    direction: ltr;
+    text-align: start;
+    padding: 11px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-sunk);
+    border: 1px solid var(--border);
+    max-block-size: 150px;
+    overflow: auto;
+    word-break: break-all;
+    color: var(--ink-2);
+    margin-block-start: 4px;
+}
+
+.input-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.82rem;
+    min-block-size: 110px;
+    direction: ltr;
+    text-align: start;
+}
+
+.steps {
+    margin: 10px 0 0;
+    padding-inline-start: 20px;
+    display: grid;
+    gap: 6px;
+    font-size: 0.88rem;
+    color: var(--ink-2);
+}
+
+.summary-list {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 4px;
+    font-size: 0.89rem;
+}
+.summary-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    padding-block: 6px;
+    border-block-end: 1px solid var(--grid);
+    font-variant-numeric: tabular-nums;
+}
+.summary-list li:last-child { border-block-end: 0; }
+.summary-list li > :first-child { color: var(--ink-2); }
+
+/* ---------- פירוט מאכלים שהגיע מהמתאמן ---------- */
+
+.meal-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 5px;
+}
+
+.meal-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 11px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-sunk);
+    border: 1px solid var(--border);
+}
+.meal-id { flex: 1; min-inline-size: 0; }
+.meal-name { font-weight: 580; font-size: 0.9rem; display: block; }
+.meal-macros {
+    font-size: 0.78rem;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+}
+
+.meal-total {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-block-start: 10px;
+    padding-block-start: 10px;
+    border-block-start: 1px solid var(--baseline);
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.9rem;
+}
+
+/* ---------- תמונות מהמתאמן ---------- */
+
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: 8px;
+}
+
+.photo-cell {
+    position: relative;
+    margin: 0;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--surface-sunk);
+    border: 1px solid var(--border);
+}
+
+/* כפתור ולא div: הגדלה היא פעולה, וצריכה להיות נגישה גם במקלדת ובקורא מסך */
+.photo-open {
+    display: block;
+    inline-size: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+.photo-open img {
+    display: block;
+    inline-size: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+}
+
+.photo-missing {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    color: var(--ink-muted);
+    font-size: 1.3rem;
+}
+
+.photo-cell figcaption {
+    padding: 4px 6px;
+    font-size: 0.72rem;
+    color: var(--ink-2);
+    background: var(--surface);
+    font-variant-numeric: tabular-nums;
+}
+
+/* fixed, כדי שיכסה את כל החלון ולא רק את הכרטיס שהוא יושב בו */
+.photo-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    display: grid;
+    place-items: center;
+    gap: 14px;
+    padding: 24px;
+    background: rgba(11, 11, 11, 0.92);
+}
+.photo-viewer img {
+    max-inline-size: 100%;
+    max-block-size: 78vh;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+}
+
+/* ---------- שגיאות ---------- */
+
+#blazor-error-ui {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 1000;
+    display: none;
+    padding: 12px 18px;
+    background: var(--warning);
+    color: #0b0b0b;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+}
+#blazor-error-ui .dismiss {
+    position: absolute;
+    inset-inline-end: 14px;
+    inset-block-start: 10px;
+    cursor: pointer;
+}
+
+@media (max-width: 560px) {
+    .hero-figure { font-size: 44px; }
+    .search { max-inline-size: none; flex: 1; }
+
+    /* ברוחב טלפון ארבע הלשוניות לא נכנסות לשורה אחת לצד הלוגו, והניסיון
+       לדחוס אותן לשם הוא מה שגרם לשמות להישבר ולטקסט להיראות שבור.
+       הן מקבלות כאן שורה שלמה משל עצמן, בגודל טקסט נוח לאצבע; אם גם
+       היא צרה מדי (מסך קטן מאוד או הגדלת גופן במערכת) השורה נגללת
+       אופקית במקום להידחס. */
+    .appbar {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding-block: 10px;
+    }
+
+    .appnav {
+        margin-inline-start: 0;
+        inline-size: 100%;
+        gap: 6px;
+        overflow-x: auto;
+        overscroll-behavior-inline: contain;
+        scrollbar-width: none;
+    }
+    .appnav::-webkit-scrollbar { display: none; }
+
+    .navlink {
+        flex: 0 0 auto;
+        padding: 7px 13px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+    .trainee-card:hover { transform: none; }
+}

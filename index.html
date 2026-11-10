@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>GYMAPP</title>
+    <base href="/GYMAPP-web/" />
+    <link rel="stylesheet" href="GYMAPP.Web.styles.css" />
+    <link rel="icon" href="favicon.png" />
+
+    <!--
+        מה שהופך את הדף לאפליקציה במסך הבית של האייפון.
+
+        manifest.webmanifest נותן את השם והאייקון; apple-mobile-web-app-capable
+        הוא מה שמסיר את סרגל הכתובת של Safari ופותח אותה במסך מלא. בלעדיו
+        "הוסף למסך הבית" יוצר קיצור דרך שנפתח כדף רגיל, עם סרגל — וזה
+        ההבדל בין משהו שמרגיש אפליקציה למשהו שמרגיש אתר.
+    -->
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="GYMAPP" />
+    <meta name="theme-color" content="#fcfcfb" />
+
+    <!--
+        גיליון העיצוב של הממשק *אינו* נטען כאן אלא ב-Layout של כל תפקיד
+        (app.coach.css / app.trainee.css). שני הצדדים מגדירים את אותם שמות
+        מחלקות בפריסות שונות, ולכן טעינה גלובלית של שניהם הייתה שוברת אותם.
+
+        מה שכן נשאר כאן הוא רק מה שיושב *מחוץ* ל-#app ולכן לא מקבל את
+        גיליון התפקיד: רקע המסך, פס הבטיחות העליון, והודעת השגיאה.
+    -->
+    <style>
+        html, body { margin: 0; block-size: 100%; }
+
+        body {
+            background: #f9f9f7;
+            color: #0b0b0b;
+            font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans Hebrew", Arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.5;
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent;
+            overflow-wrap: anywhere;
+        }
+
+        .status-bar-safe-area {
+            block-size: env(safe-area-inset-top);
+            background: #fcfcfb;
+        }
+
+        /* מחוץ ל-#app בכוונה: כשל ברינדור רכיב השורש לא מחליף את התוכן
+           של #app, ולכן הודעת שגיאה שיושבת בתוך עץ הקומפונונטות לא
+           נראית לעולם ומצב הכשל נראה כמו טעינה שנתקעה. */
+        #blazor-error-ui {
+            position: fixed;
+            inset-inline: 0;
+            inset-block-end: 0;
+            z-index: 1000;
+            display: none;
+            padding: 12px 18px;
+            background: #fab219;
+            color: #0b0b0b;
+            box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+        }
+        #blazor-error-ui .dismiss {
+            position: absolute;
+            inset-inline-end: 14px;
+            inset-block-start: 10px;
+            cursor: pointer;
+        }
+
+        /* הטעינה הראשונה מורידה את ה-runtime, וזה לוקח שנייה-שתיים ברשת
+           סלולרית. בלי סימן כלשהו המשתמש רואה מסך לבן ומניח שנשבר. */
+        .boot {
+            display: grid;
+            place-content: center;
+            min-block-size: 70svh;
+            gap: 10px;
+            text-align: center;
+            color: #6b6b6b;
+        }
+        .boot-mark { font-size: 22px; font-weight: 600; color: #0b0b0b; }
+
+        @media (prefers-color-scheme: dark) {
+            body { background: #0d0d0d; color: #ffffff; }
+            .status-bar-safe-area { background: #1a1a19; }
+            .boot-mark { color: #ffffff; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="status-bar-safe-area"></div>
+
+    <div id="app">
+        <div class="boot">
+            <div class="boot-mark">GYMAPP</div>
+            <div>טוען…</div>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui" data-nosnippet>
+        אירעה שגיאה לא צפויה.
+        <a href="." class="reload">רענון</a>
+        <span class="dismiss">🗙</span>
+    </div>
+
+    <!-- לפני blazor.webassembly.js: ה-shims קוראים ל-window.gymapp
+         בעלייה, ולכן הוא חייב להיות מוגדר קודם. -->
+    <script src="js/gymapp.js"></script>
+    <script src="_framework/blazor.webassembly.js"></script>
+
+</body>
+
+</html>
